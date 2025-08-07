@@ -1,1 +1,1 @@
-# React dashboard coming soon. Run `npm create vite@latest` to bootstrap.
+Run `npm create vite@latest` here for React dashboard.
