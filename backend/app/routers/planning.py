@@ -1,14 +1,20 @@
-
 from fastapi import APIRouter
 from datetime import datetime
-from ..models import OptimizationRequest
-from ..services import forecast, service_time, optimizer
+import pandas as pd
+
+from ..services import forecast, optimizer, service_time
+from ..schemas import OptimizationRequest
 
 router = APIRouter()
 
 @router.post("/optimize")
 def optimize(req: OptimizationRequest):
-    df = forecast.simple_forecast(datetime.utcnow(), req.horizon_hours)
+    # 1) build demand DataFrame
+    if req.demand:
+        df = pd.DataFrame([d.dict() for d in req.demand])
+    else:
+        df = forecast.simple_forecast(datetime.utcnow(), req.horizon_hours)
+
     svc = service_time.estimate_service_time()
-    shift_plan = optimizer.optimize_shift(df, svc)
-    return {"plan": shift_plan}
+    plan = optimizer.build_plan(df, svc)
+    return {"plan": plan}
