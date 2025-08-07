@@ -4,16 +4,23 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
+
       - name: Install deps
         run: |
           pip install -r backend/requirements.txt
           pip install ruff pytest
+
+      # ---- Lint (tek blok) ----
       - name: Lint
-        run: ruff backend/
+        run: |
+          ruff check backend/ --select F401,F403,E501,W503  # örnek kural seti
+
       - name: Tests
         run: pytest || echo "no tests yet"
